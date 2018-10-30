@@ -1,0 +1,51 @@
+import numpy as np
+
+def sigmoid(X):
+    return 1.0/(1.0 + np.exp(-X))
+
+#기본적인 Neural Network구조
+def init_network():
+    networks = {}
+    networks['W1'] = np.array([[0.1,0.3,0.5] , [0.2,0.4,0.6]])
+    networks['b1'] = np.array([0.1,0.2,0.3])
+
+    networks['W2'] = np.array([[0.1,0.4] , [0.2,0.5] , [0.3,0.6]])
+    networks['b2'] = np.array([0.1,0.2])
+
+    networks['W3'] = np.array([[0.1],[0.3]])
+    networks['b3'] = np.array([0.1])
+
+    return networks
+
+#Feed-forward  구조
+def  feed_forward(networks,x):
+    W1,W2,W3 = networks['W1'],networks['W2'],networks['W3']
+    b1,b2,b3 = networks['b1'],networks['b2'],networks['b3']
+
+    #hidden layer (1)
+    h1 = np.dot(x,W1) + b1
+    z1 = sigmoid(h1)
+
+    # hidden layer (2)
+    h2 = np.dot(z1,W2) + b2
+    z2 = sigmoid(h2)
+
+  #output layer (3)
+    h3 = np.dot(z2, W3) + b3
+    h_y = sigmoid(h3)
+
+    return h_y
+
+network = init_network()
+x = np.array([1.0 , 0.5])
+y = 1.0
+
+h_y = feed_forward(network,x)
+
+if h_y >= 0.5:
+    h_y = 1.0
+elif h_y < 0.5:
+    h_y = 0.0
+
+print('정답 : ',y)
+print('Feed-forward 결과 : ',h_y)
