@@ -1,0 +1,58 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+import matplotlib.pyplot as plt
+
+dataframe = pd.read_csv('./insurance.csv')
+
+#Normalize the features
+dataframe = (dataframe - dataframe.mean())/dataframe.std()
+
+X = dataframe.iloc[:,0:6]
+X = np.concatenate((np.ones([X.shape[0],1]),X),axis=1)
+
+y = dataframe.iloc[:,6:7].values
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.3)
+theta = np.zeros([1,len(X[0])])
+
+def hypothesis(X,theta):
+    return X @ theta.T
+
+def cost_fn(X,y,theta):
+    ###
+    c =np.sum(np.power((X @ theta.T-y),2)) /(2*len(X))
+    ###
+    return c
+
+def gradientDescent(X,y,theta,alpha,epoches):
+    cost_list = np.zeros(epoches)
+
+    for i in range(epoches):
+        ###
+        theta = theta - np.sum(((X @ theta.T -y)*X),axis=0)/len(X)*alpha
+
+        cost_list[i] = cost_fn(X,y,theta)
+
+    return theta,cost_list
+
+#Hyper parameters
+learning_rate = 0.001
+epoches = 1000
+
+f_theta,cost_list = gradientDescent(X_train,y_train,theta,learning_rate,epoches)
+print('Get Final THETA : ' , f_theta)
+
+f_cost = cost_fn(X,y,f_theta)
+print('Get Final COST : ',f_cost)
+
+plt.plot(np.arange(epoches),cost_list,'r')
+plt.xlabel('Number of Epoches')
+plt.ylabel('Cost')
+plt.show()
+
+print('테이트 데이터 개수 : ',len(X_test))
+for i in range(len(X_test)):
+    h = hypothesis(X_test[i],f_theta)
+    print('정답 : {} / 예측결과 : {}'.format(y_test[i],h))
